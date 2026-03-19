@@ -1,0 +1,26 @@
+services:
+  cloudlab-api:
+    build:
+      context: ./api
+    container_name: cloudlab-api
+    restart: unless-stopped
+    ports:
+      - "2999:2999"
+    volumes:
+      # Read-only Zugriff auf den Docker-Socket
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      PORT: 2999
+      DOCKER_SOCK: /var/run/docker.sock
+      CORS_ORIGINS: "*"
+    networks:
+      - npm_default  # gleiches Netzwerk wie Nginx Proxy Manager
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:2999/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+networks:
+  npm_default:
+    external: true

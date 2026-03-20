@@ -19,6 +19,14 @@ const PORT        = Number(process.env.PORT)        || 2999;
 const DOCKER_SOCK = process.env.DOCKER_SOCK         || '/var/run/docker.sock';
 const ALLOWED_ORIGINS = (process.env.CORS_ORIGINS   || '*').split(',');
 
+// Komma-getrennte Liste: "name|healthUrl,name2|healthUrl2"
+const EXTRA_SERVICES_RAW = process.env.EXTRA_SERVICES || '';
+const EXTRA_SERVICES = EXTRA_SERVICES_RAW
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean)
+  .map(s => { const [name, url] = s.split('|'); return { name, url }; });
+
 /* ── Chunked Transfer Encoding Decoder ───────────── */
 function decodeChunked(body) {
   let result = '';
@@ -38,6 +46,19 @@ function decodeChunked(body) {
   }
 
   return result || body; // fallback: return as-is if not chunked
+}
+
+/* ── HTTP Health Check ───────────────────────────── */
+function httpHealthCheck(url) {
+  return new Promise(resolve => {
+    const mod = url.startsWith('https') ? require('https') : require('http');
+    const req = mod.get(url, { timeout: 3000 }, res => {
+      resolve(res.statusCode >= 200 && res.statusCode < 300);
+      res.resume();
+    });
+    req.on('error', () => resolve(false));
+    req.on('timeout', () => { req.destroy(); resolve(false); });
+  });
 }
 
 /* ── Docker Socket HTTP Request ──────────────────── */
@@ -130,13 +151,28 @@ const server = http.createServer(async (req, res) => {
         id:     c.Id.slice(0, 12),
         name:   (c.Names[0] || '').replace(/^\//, ''),
         image:  c.Image,
-        state:  c.State,    // "running"
-        status: c.Status,   // "Up 3 hours"
+        state:  c.State,
+        status: c.Status,
         ports:  c.Ports
           .map(p => p.PublicPort)
           .filter(Boolean)
-          .filter((v, i, a) => a.indexOf(v) === i), // dedupe
+          .filter((v, i, a) => a.indexOf(v) === i),
       }));
+
+      // Extra-Services via HTTP-Health-Check ergänzen
+      if (EXTRA_SERVICES.length > 0) {
+        const checks = await Promise.all(
+          EXTRA_SERVICES.map(async ({ name, url: healthUrl }) => ({
+            name,
+            alive: await httpHealthCheck(healthUrl),
+          }))
+        );
+        for (const { name, alive } of checks) {
+          if (alive) {
+            containers.push({ id: 'systemd', name, image: 'systemd', state: 'running', status: 'running', ports: [] });
+          }
+        }
+      }
 
       res.writeHead(200);
       res.end(JSON.stringify({ containers, ts: Date.now() }));

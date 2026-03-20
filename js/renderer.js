@@ -54,7 +54,10 @@ function renderCard(item) {
        data-container="${escAttr(item.container ?? '')}"
        ${isOffline ? 'tabindex="-1" aria-disabled="true"' : 'target="_blank" rel="noopener"'}>
       <div class="card-header-row">
-        <div class="card-icon"><i data-lucide="${escAttr(item.icon)}"></i></div>
+        <div class="card-icon">${item.logoUrl
+          ? `<img src="${escAttr(item.logoUrl)}" alt="${escAttr(item.name)} logo" class="card-logo-img" />`
+          : `<i data-lucide="${escAttr(item.icon)}"></i>`
+        }</div>
         <span class="card-status ${statusClass}">
           <span class="dot"></span><span class="status-label">${statusLabel}</span>
         </span>

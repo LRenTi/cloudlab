@@ -21,10 +21,11 @@ const DASHBOARD_CONFIG = {
 
   /* ── Hero ──────────────────────────────────────── */
   hero: {
-    title:    'My personal',
-    subtitle: 'CloudLab dashboard.',
-    description: 'A single place to see services, tools, and resources running in my homelab.',
-    badge:    'Self-hosted · Cloud · Docker',
+    title:    'CloudLab',
+    subtitle: 'Place to experiment.',
+    description:
+      'My homelab playground: a single place to self-host services, manage the stack, and try ideas without worrying about a “perfect” setup. Docker, reverse proxy, auth, monitoring — break things, fix them, learn. This dashboard is the map: links, quick access, and live container status so I always know what’s running.',
+    badge:    'Playground · Self-hosted · Homelab',
     network:  '192.168.x.x',
   },
 

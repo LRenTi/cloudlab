@@ -20,7 +20,7 @@ function renderHero(hero) {
         ${escHtml(hero.badge)}
       </div>
       <h1>${escHtml(hero.title)}<br /><span>${escHtml(hero.subtitle)}</span></h1>
-      <p>${escHtml(hero.description)}</p>
+      <p class="hero-description">${escHtml(hero.description)}</p>
 
       <div class="stat-group">
         <div class="stat-pill">

@@ -267,11 +267,14 @@ body {
 }
 .hero h1 span { color: var(--text-muted); }
 
-.hero p {
+.hero-description {
   font-size: 15px;
   color: var(--text-muted);
-  max-width: 480px;
-  margin-bottom: 2rem;
+  width: 100%;
+  max-width: none;
+  margin: 0 0 2rem;
+  line-height: 1.65;
+  white-space: pre-line;
 }
 
 /* ── Stat pills ─────────────────────────────────── */

@@ -1,12 +1,19 @@
 # CloudLab Dashboard
 
-A static landing page for a personal homelab “playground”: link self-hosted services, show Docker-backed status, and jump between tools. It is meant to feel like a real lab — experiment, break things, fix them — not a generic portal.
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?logo=nodedotjs&logoColor=white)
+![Self-Hosted](https://img.shields.io/badge/Self--Hosted-FF6F00?logo=homeassistant&logoColor=white)
+![Last Commit](https://img.shields.io/github/last-commit/LRenTi/cloudlab)
+![Repo Size](https://img.shields.io/github/repo-size/LRenTi/cloudlab)
+![Works on My Machine](https://img.shields.io/badge/Works_on-My_Machine-success)
+
+A static landing page for a personal homelab "playground": link self-hosted services, show Docker-backed status, and jump between tools. It is meant to feel like a real lab -- experiment, break things, fix them -- not a generic portal.
 
 ## What it does
 
 - **Single entry point** for your reverse proxy, auth, monitoring, apps, and quick links.
 - **Live container status** via a small Node API that reads the Docker socket (`GET /api/containers`).
-- **Card grids** (e.g. Infrastructure and Services) are sorted the same way after each poll: online → idle → offline, then alphabetically by card title within each group (DOM reorder, not only CSS `order`).
+- **Card grids** (e.g. Infrastructure and Services) are sorted the same way after each poll: online > idle > offline, then alphabetically by card title within each group (DOM reorder, not only CSS `order`).
 - **One config file** (`data/services.js`): hero copy, sections, cards, Lucide icons, tags, URLs.
 
 The hero is intentionally short on the headline (**CloudLab** / **Place to experiment.**) with a longer **description** in `DASHBOARD_CONFIG.hero.description`. That block uses the full content width (not a narrow column) and supports multiple paragraphs if you use `\n\n` in the string (`white-space: pre-line`).
@@ -19,7 +26,7 @@ The hero is intentionally short on the headline (**CloudLab** / **Place to exper
 | `css/styles.css` | Layout and theming |
 | `js/main.js` | Boot, theme, API polling |
 | `js/renderer.js` | Builds hero, cards, quicklinks from config |
-| `data/services.js` | **`DASHBOARD_CONFIG`** — hero, sections, services |
+| `data/services.js` | **`DASHBOARD_CONFIG`** -- hero, sections, services |
 | `api/` | Minimal HTTP server for Docker (typically run in a container) |
 | `docker-compose.yml` | `cloudlab-api` with Docker socket mount |
 
@@ -30,7 +37,7 @@ The hero is intentionally short on the headline (**CloudLab** / **Place to exper
 3. Under **`sections`**, maintain **`cards`** (`type: 'cards'`) or **`quicklinks`** (`type: 'quicklinks'`).
 4. Set **`container`** on each item to the Docker container name so the API can match running containers.
 
-Icons: [Lucide](https://lucide.dev/icons/) — use the icon name without a prefix in the `icon` field.
+Icons: [Lucide](https://lucide.dev/icons/) -- use the icon name without a prefix in the `icon` field.
 
 Optional: override the API base URL with `api.dockerUrl` (default `null` = same origin, `/api/containers`).
 

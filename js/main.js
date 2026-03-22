@@ -4,27 +4,91 @@
  * Runs after renderer.js has injected the DOM.
  */
 
-/* ── Theme ─────────────────────────────────────── */
-const root     = document.documentElement;
-const iconSun  = document.getElementById('iconSun');
-const iconMoon = document.getElementById('iconMoon');
+/* ── Theme: system default, or Light / Dark (matches login button style) ─ */
+const root = document.documentElement;
+const THEME_PREF_KEY = 'cl-theme-pref'; /* 'system' | 'light' | 'dark' */
+const THEME_CYCLE = ['system', 'light', 'dark'];
 
-function applyTheme(dark) {
-  root.setAttribute('data-theme', dark ? 'dark' : 'light');
-  if (iconSun)  iconSun.style.display  = dark ? 'none' : '';
-  if (iconMoon) iconMoon.style.display = dark ? '' : 'none';
+function getThemePref() {
+  const p = localStorage.getItem(THEME_PREF_KEY);
+  if (p === 'system' || p === 'light' || p === 'dark') return p;
+  const legacy = localStorage.getItem('cl-theme');
+  if (legacy === 'dark' || legacy === 'light') {
+    localStorage.setItem(THEME_PREF_KEY, legacy);
+    localStorage.removeItem('cl-theme');
+    return legacy;
+  }
+  return 'system';
+}
+
+function setThemePref(pref) {
+  localStorage.setItem(THEME_PREF_KEY, pref);
+  localStorage.removeItem('cl-theme');
+}
+
+function resolveDarkFromPref() {
+  const pref = getThemePref();
+  if (pref === 'light') return false;
+  if (pref === 'dark') return true;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function applyTheme(isDark) {
+  root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+}
+
+function updateThemeButton() {
+  const pref = getThemePref();
+  const iconAuto = document.getElementById('iconThemeAuto');
+  const iconLight = document.getElementById('iconThemeLight');
+  const iconDark = document.getElementById('iconThemeDark');
+  const btn = document.getElementById('themeToggle');
+
+  [iconAuto, iconLight, iconDark].forEach(el => {
+    if (el) el.style.display = 'none';
+  });
+
+  if (pref === 'system' && iconAuto) {
+    iconAuto.style.display = '';
+    if (btn) {
+      btn.title = 'Theme: follow system — click for Light';
+      btn.setAttribute('aria-label', 'Theme: follow system. Click to use light mode.');
+    }
+  } else if (pref === 'light' && iconLight) {
+    iconLight.style.display = '';
+    if (btn) {
+      btn.title = 'Theme: light — click for Dark';
+      btn.setAttribute('aria-label', 'Theme: light. Click to use dark mode.');
+    }
+  } else if (pref === 'dark' && iconDark) {
+    iconDark.style.display = '';
+    if (btn) {
+      btn.title = 'Theme: dark — click for Auto (system)';
+      btn.setAttribute('aria-label', 'Theme: dark. Click to follow system theme.');
+    }
+  }
+
+  if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
 }
 
 function toggleTheme() {
-  const isDark = root.getAttribute('data-theme') !== 'dark';
-  applyTheme(isDark);
-  localStorage.setItem('cl-theme', isDark ? 'dark' : 'light');
+  const cur = getThemePref();
+  const i = THEME_CYCLE.indexOf(cur);
+  const next = THEME_CYCLE[(i === -1 ? 0 : i + 1) % THEME_CYCLE.length];
+  setThemePref(next);
+  applyTheme(resolveDarkFromPref());
+  updateThemeButton();
 }
 
 (function initTheme() {
-  const saved       = localStorage.getItem('cl-theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  applyTheme(saved ? saved === 'dark' : prefersDark);
+  applyTheme(resolveDarkFromPref());
+  updateThemeButton();
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (getThemePref() === 'system') {
+      applyTheme(resolveDarkFromPref());
+    }
+  });
 })();
 
 /* ── Live clock ─────────────────────────────────── */

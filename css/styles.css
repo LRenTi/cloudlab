@@ -140,14 +140,32 @@ body {
   gap: .35rem;
   padding: .35rem .65rem;
   border-radius: var(--radius);
+  font-family: inherit;
   font-size: 12px;
   font-weight: 600;
+  line-height: 1;
   text-decoration: none;
   border: 1px solid var(--border);
   background: var(--bg-card);
   color: var(--text);
   box-shadow: var(--shadow-sm);
   transition: border-color .15s ease, background .15s ease;
+}
+
+/* Native <button> defaults differ from <a>; align with auth links */
+button.btn-auth-login,
+button.btn-auth-warn {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+/* Same tap height for Sign in / theme / 2FA in the header */
+.nav-actions .btn-auth-login,
+.nav-actions .btn-auth-warn {
+  min-height: 2rem;
+  box-sizing: border-box;
 }
 
 .btn-auth-login:hover {
@@ -171,6 +189,18 @@ body {
   width: 14px;
   height: 14px;
   flex-shrink: 0;
+  display: block;
+}
+
+.btn-theme {
+  justify-content: center;
+}
+
+/* Lucide icons in theme control (same 14px box as Sign in icon) */
+.btn-theme svg {
+  width: 14px;
+  height: 14px;
+  display: block;
 }
 
 .auth-user {

@@ -142,6 +142,16 @@ const DASHBOARD_CONFIG = {
           container: 'outline',
         },
         {
+          name:      'Obsidian',
+          desc:      'Notes vault - linked notes, graph, and plugins.',
+          icon:      'notebook-pen',
+          logoUrl:   'img/obsidian-logo.svg',
+          tag:       'Notes',
+          url:       '/obsidian/',
+          status:    'offline',
+          container: 'obsidian',
+        },
+        {
           name:      'OpenClaw',
           desc:      'Self-hosted AI assistant — connects messaging apps to models across 50+ channels (WhatsApp, Telegram, Discord, and more).',
           icon:      'bot',
